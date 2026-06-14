@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
-  title: FastAPI
-  version: 0.1.0
+  title: API
+  version: 1.0.0
 paths:
   /api/v1/feed:
     get:
@@ -9,35 +9,9 @@ paths:
       description: Лента пользователя по подпискам
       operationId: feed_api_v1_feed_get
       parameters:
-      - name: limit
-        in: query
-        required: false
-        schema:
-          type: integer
-          examples:
-          - 10
-          default: 10
-          title: Limit
-      - name: cursor
-        in: query
-        required: false
-        schema:
-          anyOf:
-          - type: string
-          - type: 'null'
-          examples:
-          - eyJpZCI6MTAwfQ==
-          title: Cursor
-      - name: USER_ID_SIGNED
-        in: cookie
-        required: true
-        schema:
-          type: string
-          description: Подписанный user_id
-          examples:
-          - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOi
-          title: User Id Signed
-        description: Подписанный user_id
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/AuthCookie'
       responses:
         '200':
           description: Successful Response
@@ -46,80 +20,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/FeedResponse'
         '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
         '401':
-          description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-  /api/v1/users/{user_id}/feed:
-    get:
-      tags:
-      - users
-      summary: Лента конкретного пользователя
-      description: Лента конкретного пользователя
-      operationId: user_feed_api_v1_users__user_id__feed_get
-      parameters:
-      - name: user_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 42
-          title: User Id
-      - name: USER_ID_SIGNED
-        in: cookie
-        required: true
-        schema:
-          type: string
-          description: Подписанный user_id
-          examples:
-          - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOi
-          title: User Id Signed
-        description: Подписанный user_id
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FeedResponse'
-        '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
-        '404':
-          description: Объект не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+          $ref: '#/components/responses/Unauthorized'
   /api/v1/users/:
     post:
       tags:
@@ -141,23 +48,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserResponse'
         '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
         '409':
-          description: Конфликт состояния объекта
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConflictResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+          $ref: '#/components/responses/Conflict'
   /api/v1/users/{user_id}:
     get:
       tags:
@@ -165,15 +62,7 @@ paths:
       summary: Получение профиля пользователя
       description: Получение профиля пользователя
       operationId: get_user_api_v1_users__user_id__get
-      parameters:
-      - name: user_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 42
-          title: User Id
+      parameters: []
       responses:
         '200':
           description: Successful Response
@@ -182,23 +71,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserResponse'
         '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
         '404':
-          description: Объект не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+          $ref: '#/components/responses/NotFound'
     patch:
       tags:
       - users
@@ -206,24 +85,7 @@ paths:
       description: Обновление профиля пользователя
       operationId: update_user_api_v1_users__user_id__patch
       parameters:
-      - name: user_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 42
-          title: User Id
-      - name: USER_ID_SIGNED
-        in: cookie
-        required: true
-        schema:
-          type: string
-          description: Подписанный user_id
-          examples:
-          - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOi
-          title: User Id Signed
-        description: Подписанный user_id
+      - $ref: '#/components/parameters/AuthCookie'
       requestBody:
         required: true
         content:
@@ -238,35 +100,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserResponse'
         '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
         '401':
-          description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Доступ запрещён
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ForbiddenResponse'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Объект не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+          $ref: '#/components/responses/NotFound'
     delete:
       tags:
       - users
@@ -274,24 +118,7 @@ paths:
       description: Удаление пользователя
       operationId: delete_user_api_v1_users__user_id__delete
       parameters:
-      - name: user_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 42
-          title: User Id
-      - name: USER_ID_SIGNED
-        in: cookie
-        required: true
-        schema:
-          type: string
-          description: Подписанный user_id
-          examples:
-          - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOi
-          title: User Id Signed
-        description: Подписанный user_id
+      - $ref: '#/components/parameters/AuthCookie'
       responses:
         '200':
           description: Successful Response
@@ -300,129 +127,55 @@ paths:
               schema:
                 $ref: '#/components/schemas/BaseResponse'
         '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
         '401':
-          description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Доступ запрещён
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ForbiddenResponse'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Объект не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-  /api/v1/users/{user_id}/subscribe:
-    post:
+          $ref: '#/components/responses/NotFound'
+    parameters:
+    - $ref: '#/components/parameters/UserId'
+  /api/v1/users/{user_id}/subscribers/me:
+    put:
       tags:
       - subscription
       summary: Подписка на пользователя
       description: Подписка на пользователя
-      operationId: subscribe_api_v1_users__user_id__subscribe_post
+      operationId: subscribe_api_v1_users__user_id__subscribers_me_put
       parameters:
-      - name: user_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 42
-          title: User Id
-      - name: USER_ID_SIGNED
-        in: cookie
-        required: true
-        schema:
-          type: string
-          description: Подписанный user_id
-          examples:
-          - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOi
-          title: User Id Signed
-        description: Подписанный user_id
+      - $ref: '#/components/parameters/AuthCookie'
       responses:
-        '201':
+        '200':
           description: Successful Response
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/BaseResponse'
         '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
         '401':
-          description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+          $ref: '#/components/responses/Unauthorized'
         '404':
-          description: Объект не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundResponse'
-        '409':
-          description: Конфликт состояния объекта
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConflictResponse'
+          $ref: '#/components/responses/NotFound'
         '429':
-          description: Слишком много запросов
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TooManyRequestsResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+          $ref: '#/components/responses/TooManyRequests'
     delete:
       tags:
       - subscription
       summary: Отписка от пользователя
       description: Отписка от пользователя
-      operationId: unsubscribe_api_v1_users__user_id__subscribe_delete
+      operationId: unsubscribe_api_v1_users__user_id__subscribers_me_delete
       parameters:
-      - name: user_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 42
-          title: User Id
-      - name: USER_ID_SIGNED
-        in: cookie
-        required: true
-        schema:
-          type: string
-          description: Подписанный user_id
-          examples:
-          - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOi
-          title: User Id Signed
-        description: Подписанный user_id
+      - $ref: '#/components/parameters/AuthCookie'
       responses:
         '200':
           description: Successful Response
@@ -431,29 +184,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/BaseResponse'
         '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
         '401':
-          description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+          $ref: '#/components/responses/Unauthorized'
         '404':
-          description: Объект не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+          $ref: '#/components/responses/NotFound'
+    parameters:
+    - $ref: '#/components/parameters/UserId'
   /api/v1/users/{user_id}/photo:
     post:
       tags:
@@ -462,30 +203,9 @@ paths:
       description: Загрузка фото пользователя
       operationId: upload_user_photo_api_v1_users__user_id__photo_post
       parameters:
-      - name: user_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 42
-          title: User Id
-      - name: USER_ID_SIGNED
-        in: cookie
-        required: true
-        schema:
-          type: string
-          description: Подписанный user_id
-          examples:
-          - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOi
-          title: User Id Signed
-        description: Подписанный user_id
+      - $ref: '#/components/parameters/AuthCookie'
       requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Body_upload_user_photo_api_v1_users__user_id__photo_post'
+        $ref: '#/components/requestBodies/PhotoUpload'
       responses:
         '201':
           description: Successful Response
@@ -494,62 +214,28 @@ paths:
               schema:
                 $ref: '#/components/schemas/PhotoResponse'
         '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
         '401':
-          description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Доступ запрещён
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ForbiddenResponse'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Объект не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundResponse'
+          $ref: '#/components/responses/NotFound'
         '413':
-          description: Тело запроса слишком большое
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PayloadTooLargeResponse'
+          $ref: '#/components/responses/PayloadTooLarge'
         '415':
-          description: Неподдерживаемый тип данных
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnsupportedMediaTypeResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+          $ref: '#/components/responses/UnsupportedMediaType'
     get:
       tags:
       - user_photo
       summary: Получение фото пользователя
       description: Получение фото пользователя
       operationId: get_user_photo_api_v1_users__user_id__photo_get
-      parameters:
-      - name: user_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 42
-          title: User Id
+      parameters: []
       responses:
         '200':
           description: Successful Response
@@ -558,23 +244,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/PhotoResponse'
         '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
         '404':
-          description: Объект не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+          $ref: '#/components/responses/NotFound'
     patch:
       tags:
       - user_photo
@@ -582,30 +258,9 @@ paths:
       description: Обновление фото пользователя
       operationId: update_user_photo_api_v1_users__user_id__photo_patch
       parameters:
-      - name: user_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 42
-          title: User Id
-      - name: USER_ID_SIGNED
-        in: cookie
-        required: true
-        schema:
-          type: string
-          description: Подписанный user_id
-          examples:
-          - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOi
-          title: User Id Signed
-        description: Подписанный user_id
+      - $ref: '#/components/parameters/AuthCookie'
       requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Body_update_user_photo_api_v1_users__user_id__photo_patch'
+        $ref: '#/components/requestBodies/PhotoUpload'
       responses:
         '200':
           description: Successful Response
@@ -614,47 +269,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/PhotoResponse'
         '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
         '401':
-          description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Доступ запрещён
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ForbiddenResponse'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Объект не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundResponse'
+          $ref: '#/components/responses/NotFound'
         '413':
-          description: Тело запроса слишком большое
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PayloadTooLargeResponse'
+          $ref: '#/components/responses/PayloadTooLarge'
         '415':
-          description: Неподдерживаемый тип данных
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnsupportedMediaTypeResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+          $ref: '#/components/responses/UnsupportedMediaType'
     delete:
       tags:
       - user_photo
@@ -662,24 +291,7 @@ paths:
       description: Удаление фото пользователя
       operationId: delete_user_photo_api_v1_users__user_id__photo_delete
       parameters:
-      - name: user_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 42
-          title: User Id
-      - name: USER_ID_SIGNED
-        in: cookie
-        required: true
-        schema:
-          type: string
-          description: Подписанный user_id
-          examples:
-          - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOi
-          title: User Id Signed
-        description: Подписанный user_id
+      - $ref: '#/components/parameters/AuthCookie'
       responses:
         '200':
           description: Successful Response
@@ -688,35 +300,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/BaseResponse'
         '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
         '401':
-          description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Доступ запрещён
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ForbiddenResponse'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Объект не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+          $ref: '#/components/responses/NotFound'
+    parameters:
+    - $ref: '#/components/parameters/UserId'
   /api/v1/posts:
     post:
       tags:
@@ -725,16 +321,7 @@ paths:
       description: Создание поста
       operationId: create_post_api_v1_posts_post
       parameters:
-      - name: USER_ID_SIGNED
-        in: cookie
-        required: true
-        schema:
-          type: string
-          description: Подписанный user_id
-          examples:
-          - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOi
-          title: User Id Signed
-        description: Подписанный user_id
+      - $ref: '#/components/parameters/AuthCookie'
       requestBody:
         required: true
         content:
@@ -749,35 +336,62 @@ paths:
               schema:
                 $ref: '#/components/schemas/PostResponse'
         '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
         '401':
-          description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+          $ref: '#/components/responses/Unauthorized'
         '404':
-          description: Объект не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundResponse'
+          $ref: '#/components/responses/NotFound'
         '429':
-          description: Слишком много запросов
+          $ref: '#/components/responses/TooManyRequests'
+    get:
+      tags:
+      - posts
+      summary: Список постов
+      description: Список постов с комбинируемыми фильтрами (place_id, author_id),
+        курсорная пагинация
+      operationId: list_posts_api_v1_posts_get
+      parameters:
+      - name: place_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          examples:
+          - 7
+          title: Place Id
+      - name: author_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          examples:
+          - 42
+          title: Author Id
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Cursor'
+      responses:
+        '200':
+          description: Successful Response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TooManyRequestsResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+                $ref: '#/components/schemas/PostListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /api/v1/posts/{post_id}:
     get:
       tags:
@@ -785,15 +399,7 @@ paths:
       summary: Получение поста
       description: Получение поста
       operationId: get_post_api_v1_posts__post_id__get
-      parameters:
-      - name: post_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 15
-          title: Post Id
+      parameters: []
       responses:
         '200':
           description: Successful Response
@@ -802,23 +408,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/PostResponse'
         '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
         '404':
-          description: Объект не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+          $ref: '#/components/responses/NotFound'
     patch:
       tags:
       - posts
@@ -826,24 +422,7 @@ paths:
       description: Обновление поста
       operationId: update_post_api_v1_posts__post_id__patch
       parameters:
-      - name: post_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 15
-          title: Post Id
-      - name: USER_ID_SIGNED
-        in: cookie
-        required: true
-        schema:
-          type: string
-          description: Подписанный user_id
-          examples:
-          - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOi
-          title: User Id Signed
-        description: Подписанный user_id
+      - $ref: '#/components/parameters/AuthCookie'
       requestBody:
         required: true
         content:
@@ -858,35 +437,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/PostResponse'
         '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
         '401':
-          description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Доступ запрещён
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ForbiddenResponse'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Объект не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+          $ref: '#/components/responses/NotFound'
     delete:
       tags:
       - posts
@@ -894,24 +455,7 @@ paths:
       description: Удаление поста
       operationId: delete_post_api_v1_posts__post_id__delete
       parameters:
-      - name: post_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 15
-          title: Post Id
-      - name: USER_ID_SIGNED
-        in: cookie
-        required: true
-        schema:
-          type: string
-          description: Подписанный user_id
-          examples:
-          - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOi
-          title: User Id Signed
-        description: Подписанный user_id
+      - $ref: '#/components/parameters/AuthCookie'
       responses:
         '200':
           description: Successful Response
@@ -920,61 +464,28 @@ paths:
               schema:
                 $ref: '#/components/schemas/BaseResponse'
         '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
         '401':
-          description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Доступ запрещён
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ForbiddenResponse'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Объект не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-  /api/v1/posts/{post_id}/reaction:
+          $ref: '#/components/responses/NotFound'
+    parameters:
+    - $ref: '#/components/parameters/PostId'
+  /api/v1/posts/{post_id}/reactions/me:
     put:
       tags:
       - posts
       summary: Оценка поста
       description: Оценка поста
-      operationId: set_reaction_api_v1_posts__post_id__reaction_put
+      operationId: set_reaction_api_v1_posts__post_id__reactions_me_put
       parameters:
-      - name: post_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 15
-          title: Post Id
-      - name: USER_ID_SIGNED
-        in: cookie
-        required: true
-        schema:
-          type: string
-          description: Подписанный user_id
-          examples:
-          - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOi
-          title: User Id Signed
-        description: Подписанный user_id
+      - $ref: '#/components/parameters/AuthCookie'
       requestBody:
         required: true
         content:
@@ -989,35 +500,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/BaseResponse'
         '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
         '401':
-          description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+          $ref: '#/components/responses/Unauthorized'
         '404':
-          description: Объект не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundResponse'
+          $ref: '#/components/responses/NotFound'
         '429':
-          description: Слишком много запросов
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TooManyRequestsResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+          $ref: '#/components/responses/TooManyRequests'
+    parameters:
+    - $ref: '#/components/parameters/PostId'
   /api/v1/posts/{post_id}/comments:
     post:
       tags:
@@ -1026,24 +521,7 @@ paths:
       description: Создание комментария к посту
       operationId: create_comment_api_v1_posts__post_id__comments_post
       parameters:
-      - name: post_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 15
-          title: Post Id
-      - name: USER_ID_SIGNED
-        in: cookie
-        required: true
-        schema:
-          type: string
-          description: Подписанный user_id
-          examples:
-          - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOi
-          title: User Id Signed
-        description: Подписанный user_id
+      - $ref: '#/components/parameters/AuthCookie'
       requestBody:
         required: true
         content:
@@ -1058,35 +536,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/CommentResponse'
         '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
         '401':
-          description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+          $ref: '#/components/responses/Unauthorized'
         '404':
-          description: Объект не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundResponse'
+          $ref: '#/components/responses/NotFound'
         '429':
-          description: Слишком много запросов
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TooManyRequestsResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+          $ref: '#/components/responses/TooManyRequests'
     get:
       tags:
       - post_comments
@@ -1094,33 +554,8 @@ paths:
       description: Список комментариев поста
       operationId: list_comments_api_v1_posts__post_id__comments_get
       parameters:
-      - name: post_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 15
-          title: Post Id
-      - name: limit
-        in: query
-        required: false
-        schema:
-          type: integer
-          examples:
-          - 10
-          default: 10
-          title: Limit
-      - name: cursor
-        in: query
-        required: false
-        schema:
-          anyOf:
-          - type: string
-          - type: 'null'
-          examples:
-          - eyJpZCI6MTAwfQ==
-          title: Cursor
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Cursor'
       responses:
         '200':
           description: Successful Response
@@ -1129,23 +564,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/CommentListResponse'
         '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
         '404':
-          description: Объект не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+          $ref: '#/components/responses/NotFound'
+    parameters:
+    - $ref: '#/components/parameters/PostId'
   /api/v1/posts/{post_id}/comments/{comment_id}:
     get:
       tags:
@@ -1153,23 +580,7 @@ paths:
       summary: Получение комментария
       description: Получение комментария
       operationId: get_comment_api_v1_posts__post_id__comments__comment_id__get
-      parameters:
-      - name: post_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 15
-          title: Post Id
-      - name: comment_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 101
-          title: Comment Id
+      parameters: []
       responses:
         '200':
           description: Successful Response
@@ -1178,23 +589,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/CommentResponse'
         '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
         '404':
-          description: Объект не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+          $ref: '#/components/responses/NotFound'
     patch:
       tags:
       - post_comments
@@ -1202,32 +603,7 @@ paths:
       description: Обновление комментария
       operationId: update_comment_api_v1_posts__post_id__comments__comment_id__patch
       parameters:
-      - name: post_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 15
-          title: Post Id
-      - name: comment_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 101
-          title: Comment Id
-      - name: USER_ID_SIGNED
-        in: cookie
-        required: true
-        schema:
-          type: string
-          description: Подписанный user_id
-          examples:
-          - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOi
-          title: User Id Signed
-        description: Подписанный user_id
+      - $ref: '#/components/parameters/AuthCookie'
       requestBody:
         required: true
         content:
@@ -1242,35 +618,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/CommentResponse'
         '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
         '401':
-          description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Доступ запрещён
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ForbiddenResponse'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Объект не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+          $ref: '#/components/responses/NotFound'
     delete:
       tags:
       - post_comments
@@ -1278,32 +636,7 @@ paths:
       description: Удаление комментария
       operationId: delete_comment_api_v1_posts__post_id__comments__comment_id__delete
       parameters:
-      - name: post_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 15
-          title: Post Id
-      - name: comment_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 101
-          title: Comment Id
-      - name: USER_ID_SIGNED
-        in: cookie
-        required: true
-        schema:
-          type: string
-          description: Подписанный user_id
-          examples:
-          - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOi
-          title: User Id Signed
-        description: Подписанный user_id
+      - $ref: '#/components/parameters/AuthCookie'
       responses:
         '200':
           description: Successful Response
@@ -1312,35 +645,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/BaseResponse'
         '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
         '401':
-          description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Доступ запрещён
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ForbiddenResponse'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Объект не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+          $ref: '#/components/responses/NotFound'
+    parameters:
+    - $ref: '#/components/parameters/PostId'
+    - $ref: '#/components/parameters/CommentId'
   /api/v1/posts/{post_id}/photos:
     post:
       tags:
@@ -1349,30 +667,9 @@ paths:
       description: Загрузка фото поста
       operationId: upload_post_photo_api_v1_posts__post_id__photos_post
       parameters:
-      - name: post_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 15
-          title: Post Id
-      - name: USER_ID_SIGNED
-        in: cookie
-        required: true
-        schema:
-          type: string
-          description: Подписанный user_id
-          examples:
-          - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOi
-          title: User Id Signed
-        description: Подписанный user_id
+      - $ref: '#/components/parameters/AuthCookie'
       requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Body_upload_post_photo_api_v1_posts__post_id__photos_post'
+        $ref: '#/components/requestBodies/PhotoUpload'
       responses:
         '201':
           description: Successful Response
@@ -1381,62 +678,28 @@ paths:
               schema:
                 $ref: '#/components/schemas/PhotoResponse'
         '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
         '401':
-          description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Доступ запрещён
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ForbiddenResponse'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Объект не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundResponse'
+          $ref: '#/components/responses/NotFound'
         '413':
-          description: Тело запроса слишком большое
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PayloadTooLargeResponse'
+          $ref: '#/components/responses/PayloadTooLarge'
         '415':
-          description: Неподдерживаемый тип данных
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnsupportedMediaTypeResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+          $ref: '#/components/responses/UnsupportedMediaType'
     get:
       tags:
       - post_photos
       summary: Получение всех фото поста
       description: Получение всех фото поста
       operationId: get_post_photos_api_v1_posts__post_id__photos_get
-      parameters:
-      - name: post_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 15
-          title: Post Id
+      parameters: []
       responses:
         '200':
           description: Successful Response
@@ -1445,23 +708,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/PostPhotoListResponse'
         '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
         '404':
-          description: Объект не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+          $ref: '#/components/responses/NotFound'
+    parameters:
+    - $ref: '#/components/parameters/PostId'
   /api/v1/posts/{post_id}/photos/{photo_id}:
     get:
       tags:
@@ -1469,23 +724,7 @@ paths:
       summary: Получение фото поста
       description: Получение фото поста
       operationId: get_post_photo_api_v1_posts__post_id__photos__photo_id__get
-      parameters:
-      - name: post_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 15
-          title: Post Id
-      - name: photo_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 3
-          title: Photo Id
+      parameters: []
       responses:
         '200':
           description: Successful Response
@@ -1494,23 +733,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/PhotoResponse'
         '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
         '404':
-          description: Объект не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+          $ref: '#/components/responses/NotFound'
     delete:
       tags:
       - post_photos
@@ -1518,32 +747,7 @@ paths:
       description: Удаление фото поста
       operationId: delete_post_photo_api_v1_posts__post_id__photos__photo_id__delete
       parameters:
-      - name: post_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 15
-          title: Post Id
-      - name: photo_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 3
-          title: Photo Id
-      - name: USER_ID_SIGNED
-        in: cookie
-        required: true
-        schema:
-          type: string
-          description: Подписанный user_id
-          examples:
-          - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOi
-          title: User Id Signed
-        description: Подписанный user_id
+      - $ref: '#/components/parameters/AuthCookie'
       responses:
         '200':
           description: Successful Response
@@ -1552,35 +756,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/BaseResponse'
         '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
         '401':
-          description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Доступ запрещён
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ForbiddenResponse'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Объект не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+          $ref: '#/components/responses/NotFound'
+    parameters:
+    - $ref: '#/components/parameters/PostId'
+    - $ref: '#/components/parameters/PhotoId'
   /api/v1/places/search:
     get:
       tags:
@@ -1597,25 +786,8 @@ paths:
           examples:
           - Байкал
           title: Query
-      - name: limit
-        in: query
-        required: false
-        schema:
-          type: integer
-          examples:
-          - 10
-          default: 10
-          title: Limit
-      - name: cursor
-        in: query
-        required: false
-        schema:
-          anyOf:
-          - type: string
-          - type: 'null'
-          examples:
-          - eyJpZCI6MTAwfQ==
-          title: Cursor
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Cursor'
       responses:
         '200':
           description: Successful Response
@@ -1624,83 +796,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlaceSearchResponse'
         '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
         '429':
-          description: Слишком много запросов
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TooManyRequestsResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-  /api/v1/places/{place_id}/posts:
-    get:
-      tags:
-      - places
-      summary: Просмотр постов конкретного места
-      description: Просмотр постов конкретного места
-      operationId: place_posts_api_v1_places__place_id__posts_get
-      parameters:
-      - name: place_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          examples:
-          - 7
-          title: Place Id
-      - name: limit
-        in: query
-        required: false
-        schema:
-          type: integer
-          examples:
-          - 10
-          default: 10
-          title: Limit
-      - name: cursor
-        in: query
-        required: false
-        schema:
-          anyOf:
-          - type: string
-          - type: 'null'
-          examples:
-          - eyJpZCI6MTAwfQ==
-          title: Cursor
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PlacePostsResponse'
-        '400':
-          description: Ошибка валидации параметров
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Объект не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+          $ref: '#/components/responses/TooManyRequests'
 components:
   schemas:
     BaseResponse:
@@ -1727,36 +829,6 @@ components:
       required:
       - response
       title: BaseResponse
-    Body_update_user_photo_api_v1_users__user_id__photo_patch:
-      properties:
-        file:
-          type: string
-          format: binary
-          title: File
-      type: object
-      required:
-      - file
-      title: Body_update_user_photo_api_v1_users__user_id__photo_patch
-    Body_upload_post_photo_api_v1_posts__post_id__photos_post:
-      properties:
-        file:
-          type: string
-          format: binary
-          title: File
-      type: object
-      required:
-      - file
-      title: Body_upload_post_photo_api_v1_posts__post_id__photos_post
-    Body_upload_user_photo_api_v1_users__user_id__photo_post:
-      properties:
-        file:
-          type: string
-          format: binary
-          title: File
-      type: object
-      required:
-      - file
-      title: Body_upload_user_photo_api_v1_users__user_id__photo_post
     Comment:
       properties:
         id:
@@ -1851,10 +923,12 @@ components:
           title: Success
           default: false
         errors:
-          type: string
+          items:
+            type: string
+          type: array
           title: Errors
           examples:
-          - Объект уже существует
+          - - Объект уже существует
       type: object
       required:
       - errors
@@ -1895,6 +969,50 @@ components:
       required:
       - items
       title: CursorPage[Post]
+    Error500Response:
+      properties:
+        response:
+          additionalProperties: true
+          type: object
+          title: Response
+          default: []
+        success:
+          type: boolean
+          title: Success
+          default: false
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+          examples:
+          - - Внутренняя ошибка сервера, попробуйте позже
+      type: object
+      required:
+      - errors
+      title: Error500Response
+    Error503Response:
+      properties:
+        response:
+          additionalProperties: true
+          type: object
+          title: Response
+          default: []
+        success:
+          type: boolean
+          title: Success
+          default: false
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+          examples:
+          - - Сервис временно недоступен, попробуйте позже
+      type: object
+      required:
+      - errors
+      title: Error503Response
     ErrorResponse:
       properties:
         response:
@@ -1951,10 +1069,12 @@ components:
           title: Success
           default: false
         errors:
-          type: string
+          items:
+            type: string
+          type: array
           title: Errors
           examples:
-          - Недостаточно прав для операции
+          - - Недостаточно прав для операции
       type: object
       required:
       - errors
@@ -1976,15 +1096,6 @@ components:
       - lat
       - lon
       title: GeoPointModel
-    HTTPValidationError:
-      properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          type: array
-          title: Detail
-      type: object
-      title: HTTPValidationError
     NotFoundResponse:
       properties:
         response:
@@ -1997,10 +1108,12 @@ components:
           title: Success
           default: false
         errors:
-          type: string
+          items:
+            type: string
+          type: array
           title: Errors
           examples:
-          - Объект не найден
+          - - Объект не найден
       type: object
       required:
       - errors
@@ -2017,10 +1130,12 @@ components:
           title: Success
           default: false
         errors:
-          type: string
+          items:
+            type: string
+          type: array
           title: Errors
           examples:
-          - Размер загружаемого файла превышает допустимый
+          - - Размер загружаемого файла превышает допустимый
       type: object
       required:
       - errors
@@ -2099,28 +1214,6 @@ components:
       - geo_point
       - posts_count
       title: Place
-    PlacePostsResponse:
-      properties:
-        response:
-          $ref: '#/components/schemas/CursorPage_Post_'
-        success:
-          type: boolean
-          title: Success
-          default: true
-          examples:
-          - true
-        errors:
-          items:
-            type: string
-          type: array
-          title: Errors
-          default: []
-          examples:
-          - []
-      type: object
-      required:
-      - response
-      title: PlacePostsResponse
     PlaceSearchResponse:
       properties:
         response:
@@ -2211,6 +1304,28 @@ components:
       - text
       - place_id
       title: PostCreateRequest
+    PostListResponse:
+      properties:
+        response:
+          $ref: '#/components/schemas/CursorPage_Post_'
+        success:
+          type: boolean
+          title: Success
+          default: true
+          examples:
+          - true
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+          default: []
+          examples:
+          - []
+      type: object
+      required:
+      - response
+      title: PostListResponse
     PostPhotoListResponse:
       properties:
         response:
@@ -2311,10 +1426,12 @@ components:
           title: Success
           default: false
         errors:
-          type: string
+          items:
+            type: string
+          type: array
           title: Errors
           examples:
-          - Превышен лимит запросов, попробуйте позже
+          - - Превышен лимит запросов, попробуйте позже
       type: object
       required:
       - errors
@@ -2331,10 +1448,12 @@ components:
           title: Success
           default: false
         errors:
-          type: string
+          items:
+            type: string
+          type: array
           title: Errors
           examples:
-          - Требуется авторизация
+          - - Требуется авторизация
       type: object
       required:
       - errors
@@ -2351,10 +1470,12 @@ components:
           title: Success
           default: false
         errors:
-          type: string
+          items:
+            type: string
+          type: array
           title: Errors
           examples:
-          - Неподдерживаемый тип файла
+          - - Неподдерживаемый тип файла
       type: object
       required:
       - errors
@@ -2464,24 +1585,147 @@ components:
           - ivan.petrov@example.com
       type: object
       title: UserUpdateRequest
-    ValidationError:
-      properties:
-        loc:
-          items:
-            anyOf:
-            - type: string
-            - type: integer
-          type: array
-          title: Location
-        msg:
-          type: string
-          title: Message
-        type:
-          type: string
-          title: Error Type
-      type: object
-      required:
-      - loc
-      - msg
-      - type
-      title: ValidationError
+  responses:
+    BadRequest:
+      description: Ошибка валидации параметров
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Не авторизован
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedResponse'
+    Forbidden:
+      description: Доступ запрещён
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ForbiddenResponse'
+    NotFound:
+      description: Объект не найден
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotFoundResponse'
+    Conflict:
+      description: Конфликт состояния объекта
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ConflictResponse'
+    PayloadTooLarge:
+      description: Тело запроса слишком большое
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PayloadTooLargeResponse'
+    UnsupportedMediaType:
+      description: Неподдерживаемый тип данных
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnsupportedMediaTypeResponse'
+    TooManyRequests:
+      description: Слишком много запросов
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TooManyRequestsResponse'
+    InternalServerError:
+      description: Внутренняя ошибка сервера
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error500Response'
+    ServiceUnavailable:
+      description: Сервис временно недоступен
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error503Response'
+  parameters:
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        examples:
+        - 10
+        default: 10
+        title: Limit
+    Cursor:
+      name: cursor
+      in: query
+      required: false
+      schema:
+        anyOf:
+        - type: string
+        - type: 'null'
+        examples:
+        - eyJpZCI6MTAwfQ==
+        title: Cursor
+    AuthCookie:
+      name: USER_ID_SIGNED
+      in: cookie
+      required: true
+      schema:
+        type: string
+        description: Подписанный user_id
+        examples:
+        - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOi
+        title: User Id Signed
+      description: Подписанный user_id
+    UserId:
+      name: user_id
+      in: path
+      required: true
+      schema:
+        type: integer
+        examples:
+        - 42
+        title: User Id
+    PostId:
+      name: post_id
+      in: path
+      required: true
+      schema:
+        type: integer
+        examples:
+        - 15
+        title: Post Id
+    CommentId:
+      name: comment_id
+      in: path
+      required: true
+      schema:
+        type: integer
+        examples:
+        - 101
+        title: Comment Id
+    PhotoId:
+      name: photo_id
+      in: path
+      required: true
+      schema:
+        type: integer
+        examples:
+        - 3
+        title: Photo Id
+  requestBodies:
+    PhotoUpload:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            properties:
+              file:
+                type: string
+                format: binary
+                title: File
+            type: object
+            required:
+            - file
