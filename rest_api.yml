@@ -195,13 +195,13 @@ paths:
           $ref: '#/components/responses/NotFound'
     parameters:
     - $ref: '#/components/parameters/UserId'
-  /api/v1/users/{user_id}/photo:
+  /api/v1/users/{user_id}/photos:
     post:
       tags:
       - user_photo
       summary: Загрузка фото пользователя
       description: Загрузка фото пользователя
-      operationId: upload_user_photo_api_v1_users__user_id__photo_post
+      operationId: upload_user_photo_api_v1_users__user_id__photos_post
       parameters:
       - $ref: '#/components/parameters/AuthCookie'
       requestBody:
@@ -232,9 +232,34 @@ paths:
     get:
       tags:
       - user_photo
+      summary: Получение всех фото пользователя
+      description: Получение всех фото пользователя
+      operationId: get_user_photos_api_v1_users__user_id__photos_get
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhotoListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    parameters:
+    - $ref: '#/components/parameters/UserId'
+  /api/v1/users/{user_id}/photos/{photo_id}:
+    get:
+      tags:
+      - user_photo
       summary: Получение фото пользователя
       description: Получение фото пользователя
-      operationId: get_user_photo_api_v1_users__user_id__photo_get
+      operationId: get_user_photo_api_v1_users__user_id__photos__photo_id__get
       parameters: []
       responses:
         '200':
@@ -251,45 +276,12 @@ paths:
           $ref: '#/components/responses/ServiceUnavailable'
         '404':
           $ref: '#/components/responses/NotFound'
-    patch:
-      tags:
-      - user_photo
-      summary: Обновление фото пользователя
-      description: Обновление фото пользователя
-      operationId: update_user_photo_api_v1_users__user_id__photo_patch
-      parameters:
-      - $ref: '#/components/parameters/AuthCookie'
-      requestBody:
-        $ref: '#/components/requestBodies/PhotoUpload'
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PhotoResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-        '503':
-          $ref: '#/components/responses/ServiceUnavailable'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '413':
-          $ref: '#/components/responses/PayloadTooLarge'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
     delete:
       tags:
       - user_photo
       summary: Удаление фото пользователя
       description: Удаление фото пользователя
-      operationId: delete_user_photo_api_v1_users__user_id__photo_delete
+      operationId: delete_user_photo_api_v1_users__user_id__photos__photo_id__delete
       parameters:
       - $ref: '#/components/parameters/AuthCookie'
       responses:
@@ -313,6 +305,7 @@ paths:
           $ref: '#/components/responses/NotFound'
     parameters:
     - $ref: '#/components/parameters/UserId'
+    - $ref: '#/components/parameters/PhotoId'
   /api/v1/posts:
     post:
       tags:
@@ -706,7 +699,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PostPhotoListResponse'
+                $ref: '#/components/schemas/PhotoListResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '500':
@@ -1158,6 +1151,31 @@ components:
       - id
       - url
       title: Photo
+    PhotoListResponse:
+      properties:
+        response:
+          items:
+            $ref: '#/components/schemas/Photo'
+          type: array
+          title: Response
+        success:
+          type: boolean
+          title: Success
+          default: true
+          examples:
+          - true
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+          default: []
+          examples:
+          - []
+      type: object
+      required:
+      - response
+      title: PhotoListResponse
     PhotoResponse:
       properties:
         response:
@@ -1326,31 +1344,6 @@ components:
       required:
       - response
       title: PostListResponse
-    PostPhotoListResponse:
-      properties:
-        response:
-          items:
-            $ref: '#/components/schemas/Photo'
-          type: array
-          title: Response
-        success:
-          type: boolean
-          title: Success
-          default: true
-          examples:
-          - true
-        errors:
-          items:
-            type: string
-          type: array
-          title: Errors
-          default: []
-          examples:
-          - []
-      type: object
-      required:
-      - response
-      title: PostPhotoListResponse
     PostResponse:
       properties:
         response:
@@ -1688,6 +1681,15 @@ components:
         examples:
         - 42
         title: User Id
+    PhotoId:
+      name: photo_id
+      in: path
+      required: true
+      schema:
+        type: integer
+        examples:
+        - 3
+        title: Photo Id
     PostId:
       name: post_id
       in: path
@@ -1706,15 +1708,6 @@ components:
         examples:
         - 101
         title: Comment Id
-    PhotoId:
-      name: photo_id
-      in: path
-      required: true
-      schema:
-        type: integer
-        examples:
-        - 3
-        title: Photo Id
   requestBodies:
     PhotoUpload:
       required: true
