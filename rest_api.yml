@@ -1,0 +1,1724 @@
+openapi: 3.1.0
+info:
+  title: API
+  version: 1.0.0
+paths:
+  /api/v1/feed:
+    get:
+      summary: Лента пользователя по подпискам
+      description: Лента пользователя по подпискам
+      operationId: feed_api_v1_feed_get
+      parameters:
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/AuthCookie'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeedResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /api/v1/users/:
+    post:
+      tags:
+      - users
+      summary: Создание пользователя
+      description: Создание пользователя
+      operationId: create_user_api_v1_users__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /api/v1/users/{user_id}:
+    get:
+      tags:
+      - users
+      summary: Получение профиля пользователя
+      description: Получение профиля пользователя
+      operationId: get_user_api_v1_users__user_id__get
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags:
+      - users
+      summary: Обновление профиля пользователя
+      description: Обновление профиля пользователя
+      operationId: update_user_api_v1_users__user_id__patch
+      parameters:
+      - $ref: '#/components/parameters/AuthCookie'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+      - users
+      summary: Удаление пользователя
+      description: Удаление пользователя
+      operationId: delete_user_api_v1_users__user_id__delete
+      parameters:
+      - $ref: '#/components/parameters/AuthCookie'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    parameters:
+    - $ref: '#/components/parameters/UserId'
+  /api/v1/users/{user_id}/subscribers/me:
+    put:
+      tags:
+      - subscription
+      summary: Подписка на пользователя
+      description: Подписка на пользователя
+      operationId: subscribe_api_v1_users__user_id__subscribers_me_put
+      parameters:
+      - $ref: '#/components/parameters/AuthCookie'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+    delete:
+      tags:
+      - subscription
+      summary: Отписка от пользователя
+      description: Отписка от пользователя
+      operationId: unsubscribe_api_v1_users__user_id__subscribers_me_delete
+      parameters:
+      - $ref: '#/components/parameters/AuthCookie'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    parameters:
+    - $ref: '#/components/parameters/UserId'
+  /api/v1/users/{user_id}/photos:
+    post:
+      tags:
+      - user_photo
+      summary: Загрузка фото пользователя
+      description: Загрузка фото пользователя
+      operationId: upload_user_photo_api_v1_users__user_id__photos_post
+      parameters:
+      - $ref: '#/components/parameters/AuthCookie'
+      requestBody:
+        $ref: '#/components/requestBodies/PhotoUpload'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhotoResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+    get:
+      tags:
+      - user_photo
+      summary: Получение всех фото пользователя
+      description: Получение всех фото пользователя
+      operationId: get_user_photos_api_v1_users__user_id__photos_get
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhotoListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    parameters:
+    - $ref: '#/components/parameters/UserId'
+  /api/v1/users/{user_id}/photos/{photo_id}:
+    get:
+      tags:
+      - user_photo
+      summary: Получение фото пользователя
+      description: Получение фото пользователя
+      operationId: get_user_photo_api_v1_users__user_id__photos__photo_id__get
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhotoResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+      - user_photo
+      summary: Удаление фото пользователя
+      description: Удаление фото пользователя
+      operationId: delete_user_photo_api_v1_users__user_id__photos__photo_id__delete
+      parameters:
+      - $ref: '#/components/parameters/AuthCookie'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    parameters:
+    - $ref: '#/components/parameters/UserId'
+    - $ref: '#/components/parameters/PhotoId'
+  /api/v1/posts:
+    post:
+      tags:
+      - posts
+      summary: Создание поста
+      description: Создание поста
+      operationId: create_post_api_v1_posts_post
+      parameters:
+      - $ref: '#/components/parameters/AuthCookie'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostCreateRequest'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+    get:
+      tags:
+      - posts
+      summary: Список постов
+      description: Список постов с комбинируемыми фильтрами (place_id, author_id),
+        курсорная пагинация
+      operationId: list_posts_api_v1_posts_get
+      parameters:
+      - name: place_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          examples:
+          - 7
+          title: Place Id
+      - name: author_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          examples:
+          - 42
+          title: Author Id
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Cursor'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /api/v1/posts/{post_id}:
+    get:
+      tags:
+      - posts
+      summary: Получение поста
+      description: Получение поста
+      operationId: get_post_api_v1_posts__post_id__get
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags:
+      - posts
+      summary: Обновление поста
+      description: Обновление поста
+      operationId: update_post_api_v1_posts__post_id__patch
+      parameters:
+      - $ref: '#/components/parameters/AuthCookie'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostUpdateRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+      - posts
+      summary: Удаление поста
+      description: Удаление поста
+      operationId: delete_post_api_v1_posts__post_id__delete
+      parameters:
+      - $ref: '#/components/parameters/AuthCookie'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    parameters:
+    - $ref: '#/components/parameters/PostId'
+  /api/v1/posts/{post_id}/reactions/me:
+    put:
+      tags:
+      - posts
+      summary: Оценка поста
+      description: Оценка поста
+      operationId: set_reaction_api_v1_posts__post_id__reactions_me_put
+      parameters:
+      - $ref: '#/components/parameters/AuthCookie'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReactionRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+    parameters:
+    - $ref: '#/components/parameters/PostId'
+  /api/v1/posts/{post_id}/comments:
+    post:
+      tags:
+      - post_comments
+      summary: Создание комментария к посту
+      description: Создание комментария к посту
+      operationId: create_comment_api_v1_posts__post_id__comments_post
+      parameters:
+      - $ref: '#/components/parameters/AuthCookie'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+    get:
+      tags:
+      - post_comments
+      summary: Список комментариев поста
+      description: Список комментариев поста
+      operationId: list_comments_api_v1_posts__post_id__comments_get
+      parameters:
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Cursor'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    parameters:
+    - $ref: '#/components/parameters/PostId'
+  /api/v1/posts/{post_id}/comments/{comment_id}:
+    get:
+      tags:
+      - post_comments
+      summary: Получение комментария
+      description: Получение комментария
+      operationId: get_comment_api_v1_posts__post_id__comments__comment_id__get
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags:
+      - post_comments
+      summary: Обновление комментария
+      description: Обновление комментария
+      operationId: update_comment_api_v1_posts__post_id__comments__comment_id__patch
+      parameters:
+      - $ref: '#/components/parameters/AuthCookie'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+      - post_comments
+      summary: Удаление комментария
+      description: Удаление комментария
+      operationId: delete_comment_api_v1_posts__post_id__comments__comment_id__delete
+      parameters:
+      - $ref: '#/components/parameters/AuthCookie'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    parameters:
+    - $ref: '#/components/parameters/PostId'
+    - $ref: '#/components/parameters/CommentId'
+  /api/v1/posts/{post_id}/photos:
+    post:
+      tags:
+      - post_photos
+      summary: Загрузка фото поста
+      description: Загрузка фото поста
+      operationId: upload_post_photo_api_v1_posts__post_id__photos_post
+      parameters:
+      - $ref: '#/components/parameters/AuthCookie'
+      requestBody:
+        $ref: '#/components/requestBodies/PhotoUpload'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhotoResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+    get:
+      tags:
+      - post_photos
+      summary: Получение всех фото поста
+      description: Получение всех фото поста
+      operationId: get_post_photos_api_v1_posts__post_id__photos_get
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhotoListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    parameters:
+    - $ref: '#/components/parameters/PostId'
+  /api/v1/posts/{post_id}/photos/{photo_id}:
+    get:
+      tags:
+      - post_photos
+      summary: Получение фото поста
+      description: Получение фото поста
+      operationId: get_post_photo_api_v1_posts__post_id__photos__photo_id__get
+      parameters: []
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhotoResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+      - post_photos
+      summary: Удаление фото поста
+      description: Удаление фото поста
+      operationId: delete_post_photo_api_v1_posts__post_id__photos__photo_id__delete
+      parameters:
+      - $ref: '#/components/parameters/AuthCookie'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    parameters:
+    - $ref: '#/components/parameters/PostId'
+    - $ref: '#/components/parameters/PhotoId'
+  /api/v1/places/search:
+    get:
+      tags:
+      - places
+      summary: Поиск популярных мест
+      description: Поиск популярных мест
+      operationId: search_places_api_v1_places_search_get
+      parameters:
+      - name: query
+        in: query
+        required: true
+        schema:
+          type: string
+          examples:
+          - Байкал
+          title: Query
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Cursor'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaceSearchResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+components:
+  schemas:
+    BaseResponse:
+      properties:
+        response:
+          additionalProperties: true
+          type: object
+          title: Response
+        success:
+          type: boolean
+          title: Success
+          default: true
+          examples:
+          - true
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+          default: []
+          examples:
+          - []
+      type: object
+      required:
+      - response
+      title: BaseResponse
+    Comment:
+      properties:
+        id:
+          type: integer
+          title: Id
+          examples:
+          - 101
+        author:
+          $ref: '#/components/schemas/User'
+        text:
+          type: string
+          title: Text
+          examples:
+          - Отличное место, тоже там был!
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+          examples:
+          - '2026-05-01T15:05:03'
+      type: object
+      required:
+      - id
+      - author
+      - text
+      - created_at
+      title: Comment
+    CommentListResponse:
+      properties:
+        response:
+          $ref: '#/components/schemas/CursorPage_Comment_'
+        success:
+          type: boolean
+          title: Success
+          default: true
+          examples:
+          - true
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+          default: []
+          examples:
+          - []
+      type: object
+      required:
+      - response
+      title: CommentListResponse
+    CommentRequest:
+      properties:
+        text:
+          type: string
+          title: Text
+          examples:
+          - Отличное место!
+      type: object
+      required:
+      - text
+      title: CommentRequest
+    CommentResponse:
+      properties:
+        response:
+          $ref: '#/components/schemas/Comment'
+        success:
+          type: boolean
+          title: Success
+          default: true
+          examples:
+          - true
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+          default: []
+          examples:
+          - []
+      type: object
+      required:
+      - response
+      title: CommentResponse
+    ConflictResponse:
+      properties:
+        response:
+          additionalProperties: true
+          type: object
+          title: Response
+          default: []
+        success:
+          type: boolean
+          title: Success
+          default: false
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+          examples:
+          - - Объект уже существует
+      type: object
+      required:
+      - errors
+      title: ConflictResponse
+    CursorPage_Comment_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/Comment'
+          type: array
+          title: Items
+        next_cursor:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next Cursor
+          examples:
+          - eyJpZCI6MTAwfQ==
+      type: object
+      required:
+      - items
+      title: CursorPage[Comment]
+    CursorPage_Post_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/Post'
+          type: array
+          title: Items
+        next_cursor:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next Cursor
+          examples:
+          - eyJpZCI6MTAwfQ==
+      type: object
+      required:
+      - items
+      title: CursorPage[Post]
+    Error500Response:
+      properties:
+        response:
+          additionalProperties: true
+          type: object
+          title: Response
+          default: []
+        success:
+          type: boolean
+          title: Success
+          default: false
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+          examples:
+          - - Внутренняя ошибка сервера, попробуйте позже
+      type: object
+      required:
+      - errors
+      title: Error500Response
+    Error503Response:
+      properties:
+        response:
+          additionalProperties: true
+          type: object
+          title: Response
+          default: []
+        success:
+          type: boolean
+          title: Success
+          default: false
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+          examples:
+          - - Сервис временно недоступен, попробуйте позже
+      type: object
+      required:
+      - errors
+      title: Error503Response
+    ErrorResponse:
+      properties:
+        response:
+          additionalProperties: true
+          type: object
+          title: Response
+          default: []
+        success:
+          type: boolean
+          title: Success
+          default: false
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+          examples:
+          - - Параметр `id` должен быть положительным
+      type: object
+      required:
+      - errors
+      title: ErrorResponse
+    FeedResponse:
+      properties:
+        response:
+          $ref: '#/components/schemas/CursorPage_Post_'
+        success:
+          type: boolean
+          title: Success
+          default: true
+          examples:
+          - true
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+          default: []
+          examples:
+          - []
+      type: object
+      required:
+      - response
+      title: FeedResponse
+    ForbiddenResponse:
+      properties:
+        response:
+          additionalProperties: true
+          type: object
+          title: Response
+          default: []
+        success:
+          type: boolean
+          title: Success
+          default: false
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+          examples:
+          - - Недостаточно прав для операции
+      type: object
+      required:
+      - errors
+      title: ForbiddenResponse
+    GeoPointModel:
+      properties:
+        lat:
+          type: number
+          title: Lat
+          examples:
+          - 51.85
+        lon:
+          type: number
+          title: Lon
+          examples:
+          - 104.87
+      type: object
+      required:
+      - lat
+      - lon
+      title: GeoPointModel
+    NotFoundResponse:
+      properties:
+        response:
+          additionalProperties: true
+          type: object
+          title: Response
+          default: []
+        success:
+          type: boolean
+          title: Success
+          default: false
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+          examples:
+          - - Объект не найден
+      type: object
+      required:
+      - errors
+      title: NotFoundResponse
+    PayloadTooLargeResponse:
+      properties:
+        response:
+          additionalProperties: true
+          type: object
+          title: Response
+          default: []
+        success:
+          type: boolean
+          title: Success
+          default: false
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+          examples:
+          - - Размер загружаемого файла превышает допустимый
+      type: object
+      required:
+      - errors
+      title: PayloadTooLargeResponse
+    Photo:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+          examples:
+          - 550e8400-e29b-41d4-a716-446655440000
+        url:
+          type: string
+          title: Url
+          examples:
+          - https://cdn.travel.example/photos/550e8400.jpg
+      type: object
+      required:
+      - id
+      - url
+      title: Photo
+    PhotoListResponse:
+      properties:
+        response:
+          items:
+            $ref: '#/components/schemas/Photo'
+          type: array
+          title: Response
+        success:
+          type: boolean
+          title: Success
+          default: true
+          examples:
+          - true
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+          default: []
+          examples:
+          - []
+      type: object
+      required:
+      - response
+      title: PhotoListResponse
+    PhotoResponse:
+      properties:
+        response:
+          $ref: '#/components/schemas/Photo'
+        success:
+          type: boolean
+          title: Success
+          default: true
+          examples:
+          - true
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+          default: []
+          examples:
+          - []
+      type: object
+      required:
+      - response
+      title: PhotoResponse
+    Place:
+      properties:
+        id:
+          type: integer
+          title: Id
+          examples:
+          - 7
+        name:
+          type: string
+          title: Name
+          examples:
+          - Озеро Байкал
+        description:
+          type: string
+          title: Description
+          examples:
+          - Озеро тектонического происхождения в южной части Восточной Сибири, на
+            границе Иркутской области и Республики Бурятия. Это самое глубокое озеро
+            на планете и крупнейший природный резервуар пресной воды.
+        geo_point:
+          $ref: '#/components/schemas/GeoPointModel'
+        posts_count:
+          type: integer
+          title: Posts Count
+          examples:
+          - 15234
+      type: object
+      required:
+      - id
+      - name
+      - description
+      - geo_point
+      - posts_count
+      title: Place
+    PlaceSearchResponse:
+      properties:
+        response:
+          items:
+            $ref: '#/components/schemas/Place'
+          type: array
+          title: Response
+        success:
+          type: boolean
+          title: Success
+          default: true
+          examples:
+          - true
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+          default: []
+          examples:
+          - []
+      type: object
+      required:
+      - response
+      title: PlaceSearchResponse
+    Post:
+      properties:
+        id:
+          type: integer
+          title: Id
+          examples:
+          - 15
+        author:
+          $ref: '#/components/schemas/User'
+        title:
+          type: string
+          title: Title
+          examples:
+          - Закат на Байкале
+        text:
+          type: string
+          title: Text
+          examples:
+          - Провели весь день на берегу, виды невероятные
+        place:
+          $ref: '#/components/schemas/Place'
+        photos:
+          items:
+            $ref: '#/components/schemas/Photo'
+          type: array
+          title: Photos
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+          examples:
+          - '2026-05-01T15:05:03'
+      type: object
+      required:
+      - id
+      - author
+      - title
+      - text
+      - place
+      - photos
+      - created_at
+      title: Post
+    PostCreateRequest:
+      properties:
+        title:
+          type: string
+          title: Title
+          examples:
+          - Закат на Байкале
+        text:
+          type: string
+          title: Text
+          examples:
+          - Провели весь день на берегу Байкала
+        place_id:
+          type: integer
+          title: Place Id
+          examples:
+          - 7
+      type: object
+      required:
+      - title
+      - text
+      - place_id
+      title: PostCreateRequest
+    PostListResponse:
+      properties:
+        response:
+          $ref: '#/components/schemas/CursorPage_Post_'
+        success:
+          type: boolean
+          title: Success
+          default: true
+          examples:
+          - true
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+          default: []
+          examples:
+          - []
+      type: object
+      required:
+      - response
+      title: PostListResponse
+    PostResponse:
+      properties:
+        response:
+          $ref: '#/components/schemas/Post'
+        success:
+          type: boolean
+          title: Success
+          default: true
+          examples:
+          - true
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+          default: []
+          examples:
+          - []
+      type: object
+      required:
+      - response
+      title: PostResponse
+    PostUpdateRequest:
+      properties:
+        title:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Title
+          examples:
+          - Закат на Байкале
+        text:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Text
+          examples:
+          - Обновлённое описание поста
+        place_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Place Id
+          examples:
+          - 7
+      type: object
+      title: PostUpdateRequest
+    ReactionRequest:
+      properties:
+        reaction:
+          $ref: '#/components/schemas/ReactionType'
+          examples:
+          - like
+      type: object
+      required:
+      - reaction
+      title: ReactionRequest
+    ReactionType:
+      type: string
+      enum:
+      - like
+      - none
+      title: ReactionType
+    TooManyRequestsResponse:
+      properties:
+        response:
+          additionalProperties: true
+          type: object
+          title: Response
+          default: []
+        success:
+          type: boolean
+          title: Success
+          default: false
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+          examples:
+          - - Превышен лимит запросов, попробуйте позже
+      type: object
+      required:
+      - errors
+      title: TooManyRequestsResponse
+    UnauthorizedResponse:
+      properties:
+        response:
+          additionalProperties: true
+          type: object
+          title: Response
+          default: []
+        success:
+          type: boolean
+          title: Success
+          default: false
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+          examples:
+          - - Требуется авторизация
+      type: object
+      required:
+      - errors
+      title: UnauthorizedResponse
+    UnsupportedMediaTypeResponse:
+      properties:
+        response:
+          additionalProperties: true
+          type: object
+          title: Response
+          default: []
+        success:
+          type: boolean
+          title: Success
+          default: false
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+          examples:
+          - - Неподдерживаемый тип файла
+      type: object
+      required:
+      - errors
+      title: UnsupportedMediaTypeResponse
+    User:
+      properties:
+        first_name:
+          type: string
+          title: First Name
+          examples:
+          - Иван
+        last_name:
+          type: string
+          title: Last Name
+          examples:
+          - Петров
+        email:
+          type: string
+          title: Email
+          examples:
+          - ivan.petrov@example.com
+        id:
+          type: integer
+          title: Id
+          examples:
+          - 42
+        photo_url:
+          type: string
+          title: Photo Url
+          examples:
+          - https://cdn.travel.example/avatars/42.jpg
+      type: object
+      required:
+      - first_name
+      - last_name
+      - email
+      - id
+      - photo_url
+      title: User
+    UserCreateRequest:
+      properties:
+        first_name:
+          type: string
+          title: First Name
+          examples:
+          - Иван
+        last_name:
+          type: string
+          title: Last Name
+          examples:
+          - Петров
+        email:
+          type: string
+          title: Email
+          examples:
+          - ivan.petrov@example.com
+      type: object
+      required:
+      - first_name
+      - last_name
+      - email
+      title: UserCreateRequest
+    UserResponse:
+      properties:
+        response:
+          $ref: '#/components/schemas/User'
+        success:
+          type: boolean
+          title: Success
+          default: true
+          examples:
+          - true
+        errors:
+          items:
+            type: string
+          type: array
+          title: Errors
+          default: []
+          examples:
+          - []
+      type: object
+      required:
+      - response
+      title: UserResponse
+    UserUpdateRequest:
+      properties:
+        first_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: First Name
+          examples:
+          - Иван
+        last_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Last Name
+          examples:
+          - Петров
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+          examples:
+          - ivan.petrov@example.com
+      type: object
+      title: UserUpdateRequest
+  responses:
+    BadRequest:
+      description: Ошибка валидации параметров
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Не авторизован
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedResponse'
+    Forbidden:
+      description: Доступ запрещён
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ForbiddenResponse'
+    NotFound:
+      description: Объект не найден
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotFoundResponse'
+    Conflict:
+      description: Конфликт состояния объекта
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ConflictResponse'
+    PayloadTooLarge:
+      description: Тело запроса слишком большое
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PayloadTooLargeResponse'
+    UnsupportedMediaType:
+      description: Неподдерживаемый тип данных
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnsupportedMediaTypeResponse'
+    TooManyRequests:
+      description: Слишком много запросов
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TooManyRequestsResponse'
+    InternalServerError:
+      description: Внутренняя ошибка сервера
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error500Response'
+    ServiceUnavailable:
+      description: Сервис временно недоступен
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error503Response'
+  parameters:
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        examples:
+        - 10
+        default: 10
+        title: Limit
+    Cursor:
+      name: cursor
+      in: query
+      required: false
+      schema:
+        anyOf:
+        - type: string
+        - type: 'null'
+        examples:
+        - eyJpZCI6MTAwfQ==
+        title: Cursor
+    AuthCookie:
+      name: USER_ID_SIGNED
+      in: cookie
+      required: true
+      schema:
+        type: string
+        description: Подписанный user_id
+        examples:
+        - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOi
+        title: User Id Signed
+      description: Подписанный user_id
+    UserId:
+      name: user_id
+      in: path
+      required: true
+      schema:
+        type: integer
+        examples:
+        - 42
+        title: User Id
+    PhotoId:
+      name: photo_id
+      in: path
+      required: true
+      schema:
+        type: integer
+        examples:
+        - 3
+        title: Photo Id
+    PostId:
+      name: post_id
+      in: path
+      required: true
+      schema:
+        type: integer
+        examples:
+        - 15
+        title: Post Id
+    CommentId:
+      name: comment_id
+      in: path
+      required: true
+      schema:
+        type: integer
+        examples:
+        - 101
+        title: Comment Id
+  requestBodies:
+    PhotoUpload:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            properties:
+              file:
+                type: string
+                format: binary
+                title: File
+            type: object
+            required:
+            - file
