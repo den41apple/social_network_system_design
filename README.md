@@ -107,14 +107,26 @@ Disks = max(1, 1, 3) = 3 HDD
 
 ##### Посты (Postgres)
 ```
-capacity ≈ 0.7 ТБ (метаданные постов + фоток), throughput ≈ 0.8 МБ/с, iops = 17 + 580 + 230 = 827
+capacity ≈ 0.3 ТБ (600 млн × ~500 B), throughput ≈ 0.5 МБ/с
+iops = создание 17 + лента 580 + поиск 230 = 827
 
-Disks_for_capacity   = 0.7 ТБ / 32 ТБ      = 0.02  ≈ 1
-Disks_for_throughput = 0.8 МБ/с / 100 МБ/с = 0.008 ≈ 1
+Disks_for_capacity   = 0.3 ТБ / 32 ТБ      = 0.009 ≈ 1
+Disks_for_throughput = 0.5 МБ/с / 100 МБ/с = 0.005 ≈ 1
 Disks_for_iops       = 827 / 100           = 8.27  ≈ 9
 Disks = max(1, 1, 9) = 9 HDD
 ```
 
+##### Фото постов, метаданные (Postgres)
+```
+В Postgres только записи о фото (url, position, post_id); сами файлы в CDN.
+capacity ≈ 0.4 ТБ (2.5 млрд × ~150 B), throughput ≈ 0.1 МБ/с
+iops = создание 85 (≈5 фото × 17 RPS постов) + чтение 810 (лента 580 + открытие поста 230) = 895
+
+Disks_for_capacity   = 0.4 ТБ / 32 ТБ      = 0.012 ≈ 1
+Disks_for_throughput = 0.1 МБ/с / 100 МБ/с ≈ 0     ≈ 1
+Disks_for_iops       = 895 / 100           = 8.95  ≈ 9
+Disks = max(1, 1, 9) = 9 HDD
+```
 ##### Подписки (Postgres)
 ```
 capacity ≈ 0.05 ТБ, throughput ≈ 0 МБ/с, iops = 17 + 580 = 597
@@ -144,14 +156,14 @@ Disks = max(1, 1, 12) = 12 HDD
 
 
 ````
-Postgres (Посты + Комменты + Подписки):
-   данные   = 0.7 + 0.3 + 0.05 ≈ 1 ТБ
+Postgres (Посты + Фото-мета + Комменты + Подписки):
+   данные   = 0.3 + 0.4 + 0.3 + 0.05 ≈ 1 ТБ
    capacity = 1 ТБ × 1.4 (индексы) × 1.3 (запас: рост, WAL, врем. файлы) ≈ 1.8 ТБ
-   iops     = 827 + 290 + 597 = 1714
+   iops     = 827 + 895 + 290 + 597 = 2609
 
    Disks_for_capacity = 1.8 ТБ / 100 ТБ = 0.018 ≈ 1
-   Disks_for_iops     = 1714 / 1000      = 1.7  ≈ 2
-   Disks = max(1, 2) = 2 SSD
+   Disks_for_iops     = 2609 / 1000      = 2.6  ≈ 3
+   Disks = max(1, 3) = 3 SSD
 
 Cassandra (Лайки):
    данные   = 0.6 ТБ
@@ -163,8 +175,8 @@ Cassandra (Лайки):
    Disks = max(1, 2) = 2 SSD
 ````
 
-**Итого: 4 × SSD SATA:** 
-- Postgres — 2 по 2 ТБ, 
-- Cassandra — 2 по 1 ТБ
+**Итого: 5 × SSD SATA:** 
+- Postgres — 3 SSD по 2 ТБ, 
+- Cassandra — 2 SSD по 1 ТБ
 
 
