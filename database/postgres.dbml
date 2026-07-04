@@ -1,0 +1,111 @@
+// Лайки хранятся в Cassandra
+
+
+Table users {
+  id              bigint       [pk, increment]
+  first_name      varchar(100)
+  last_name       varchar(100)
+  email           varchar(255) [not null, unique]
+  avatar_photo_id uuid
+  created_at      timestamp    [not null, default: `now()`]
+  updated_at      timestamp    [not null, default: `now()`]
+
+  indexes {
+    email [unique]
+  }
+}
+
+Table places {
+  id          bigint       [pk, increment]
+  name        varchar(255) [not null]
+  description text
+  geometry    geography    [not null, note: 'PostGIS геометрия']
+  centroid    geography    [note: 'Центр полигона. считается автоматически если не заполнен. Но желательно заполнять, если полигон выгнутый и автоматический центр находится вне него']
+  posts_count bigint       [not null, default: 0, note: 'Счётчик постов, ради ускорения чтения']
+  created_at  timestamp    [not null, default: `now()`]
+
+  indexes {
+    geometry [type: gist, note: 'гео-запросы: рядом / пересечение / вхождение']
+    centroid [type: gist, note: 'быстрый поиск по ближайшей точке']
+    name     [note: 'поиск мест по названию; при росте — вынести в OpenSearch']
+  }
+}
+
+Table posts {
+  id          bigint        [pk, increment]
+  author_id   bigint        [not null]
+  place_id    bigint        [null, note: 'привязка к известному месту из справочника; null — если места нет']
+  lat         double        [null, note: 'собственная точка поста, если place_id не задан']
+  lon         double        [null, note: 'собственная точка поста, если place_id не задан']
+  title       varchar(255)  [not null]
+  text        varchar(2000) [note: 'описание до 2000 символов']
+  created_at  timestamp     [not null, default: `now()`]
+  updated_at  timestamp     [not null, default: `now()`]
+
+  indexes {
+    (author_id, created_at) [note: 'лента автора / список постов по автору']
+    (place_id, created_at)  [note: 'посты места']
+    (lat, lon) [note: 'гео-поиск постов по координатам, когда место из справочника не указано']
+  }
+
+  Note: 'CHECK (place_id IS NOT NULL OR (lat IS NOT NULL AND lon IS NOT NULL)) — пост привязан либо к известному месту, либо к своей точке'
+}
+
+Table post_photos {
+  id          uuid        [pk]
+  post_id     bigint      [not null]
+  url         varchar(255) [not null, note: 'ссылка на файл в CDN']
+  position    smallint    [not null, default: 0, note: 'порядок в галерее поста']
+  created_at  timestamp   [not null, default: `now()`]
+
+  indexes {
+    post_id
+  }
+}
+
+Table user_photos {
+  id          uuid        [pk]
+  user_id     bigint      [not null]
+  url         varchar(255) [not null, note: 'ссылка на файл в CDN']
+  created_at  timestamp   [not null, default: `now()`]
+
+  indexes {
+    user_id
+  }
+}
+
+Table comments {
+  id          bigint       [pk, increment]
+  post_id     bigint       [not null]
+  author_id   bigint       [not null]
+  text        varchar(300) [not null]
+  created_at  timestamp    [not null, default: `now()`]
+  updated_at  timestamp    [not null, default: `now()`]
+
+  indexes {
+    (post_id, created_at) [note: 'постраничный вывод комментариев поста в обратном хронологическом порядке']
+  }
+}
+
+
+Table subscriptions {
+  follower_id bigint     [not null, note: 'кто подписался']
+  followee_id bigint     [not null, note: 'на кого подписались']
+  created_at  timestamp  [not null, default: `now()`]
+
+  indexes {
+    (follower_id, followee_id) [pk]
+    (followee_id) [note: 'список подписчиков пользователя']
+    (follower_id) [note: 'на кого подписан пользователь — построение ленты']
+  }
+}
+
+Ref: posts.author_id > users.id
+Ref: posts.place_id > places.id
+Ref: post_photos.post_id > posts.id
+Ref: user_photos.user_id > users.id
+Ref: users.avatar_photo_id > user_photos.id
+Ref: comments.post_id > posts.id
+Ref: comments.author_id > users.id
+Ref: subscriptions.follower_id > users.id
+Ref: subscriptions.followee_id > users.id

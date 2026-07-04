@@ -1,0 +1,23 @@
+// Вынесено из PostgreSQL: ~20 млрд строк/год при 580 RPS на запись — другой класс нагрузки (append-heavy)
+
+
+// Запрос 1: "лайкнул ли текущий пользователь этот пост" + сама запись лайка.
+// PRIMARY KEY ((post_id), user_id):
+//   partition key = post_id  — все лайки одного поста лежат вместе;
+//   clustering key = user_id — точечное чтение "есть ли лайк от user".
+Table likes_by_post {
+  post_id    bigint    [note: 'partition key']
+  user_id    bigint    [note: 'clustering key']
+  created_at timestamp
+
+  indexes {
+    (post_id, user_id) [pk]
+  }
+}
+
+// Запрос 2: "сколько лайков у поста" — для отображения в ленте и на посте.
+// PRIMARY KEY (post_id), partition key = post_id.
+Table likes_count_by_post {
+  post_id    bigint  [pk, note: 'partition key']
+  like_count bigint  [note: 'тип COUNTER в касандре, +1/-1 на лайк/снятие']
+}

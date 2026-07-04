@@ -88,3 +88,95 @@
 Итого: ≈ 2 ПБ <br>
 
 **Общий объем CDN `≈ 2 ПБ`**
+
+## Расчет дисков
+Берем диск для старта — HDD (32 ТБ, 100 IOPS, 100 МБ/с)
+Так как изображения находятся в CDN, в расчёт не входят.
+
+> Все метрики считаем read + write за исключением `Disks_for_capacity`, тут только write
+
+##### Комментарии (Postgres)
+```
+capacity ≈ 0.3 ТБ, throughput ≈ 0.5 МБ/с, iops = 60 + 230 = 290
+
+Disks_for_capacity   = 0.3 ТБ / 32 ТБ      = 0.009 ≈ 1
+Disks_for_throughput = 0.5 МБ/с / 100 МБ/с = 0.005 ≈ 1
+Disks_for_iops       = 290 / 100           = 2.9   ≈ 3
+Disks = max(1, 1, 3) = 3 HDD
+```
+
+##### Посты (Postgres)
+```
+capacity ≈ 0.3 ТБ (600 млн × ~500 B), throughput ≈ 0.5 МБ/с
+iops = создание 17 + лента 580 + поиск 230 = 827
+
+Disks_for_capacity   = 0.3 ТБ / 32 ТБ      = 0.009 ≈ 1
+Disks_for_throughput = 0.5 МБ/с / 100 МБ/с = 0.005 ≈ 1
+Disks_for_iops       = 827 / 100           = 8.27  ≈ 9
+Disks = max(1, 1, 9) = 9 HDD
+```
+
+##### Фото постов, метаданные (Postgres)
+```
+В Postgres только записи о фото (url, position, post_id); сами файлы в CDN.
+capacity ≈ 0.4 ТБ (2.5 млрд × ~150 B), throughput ≈ 0.1 МБ/с
+iops = создание 85 (≈5 фото × 17 RPS постов) + чтение 810 (лента 580 + открытие поста 230) = 895
+
+Disks_for_capacity   = 0.4 ТБ / 32 ТБ      = 0.012 ≈ 1
+Disks_for_throughput = 0.1 МБ/с / 100 МБ/с ≈ 0     ≈ 1
+Disks_for_iops       = 895 / 100           = 8.95  ≈ 9
+Disks = max(1, 1, 9) = 9 HDD
+```
+##### Подписки (Postgres)
+```
+capacity ≈ 0.05 ТБ, throughput ≈ 0 МБ/с, iops = 17 + 580 = 597
+
+Disks_for_capacity   = 0.05 ТБ / 32 ТБ    = 0.002 ≈ 1
+Disks_for_throughput = 0 МБ/с / 100 МБ/с  ≈ 0     ≈ 1
+Disks_for_iops       = 597 / 100          = 5.97  ≈ 6
+Disks = max(1, 1, 6) = 6 HDD
+```
+
+##### Лайки (Cassandra)
+```
+capacity ≈ 0.6 ТБ (20 млрд × ~30 B), throughput ≈ 0.01 МБ/с
+iops = запись 580 + чтение 580 = 1160
+   чтение 580 — по сути RPS ленты
+
+Disks_for_capacity   = 0.6 ТБ / 32 ТБ       = 0.02  ≈ 1
+Disks_for_throughput = 0.01 МБ/с / 100 МБ/с ≈ 0     ≈ 1
+Disks_for_iops       = 1160 / 100           = 11.6  ≈ 12
+Disks = max(1, 1, 12) = 12 HDD
+```
+
+##### Вывод
+Все подсистемы упираются в **IOPS** (capacity и throughput везде дают 1, метаданных мало). 
+На HDD выходило много дисков ради IOPS на крошечных данных. 
+Берём SSD SATA (1000 IOPS, 500 МБ/с, до 100 ТБ):
+
+
+````
+Postgres (Посты + Фото-мета + Комменты + Подписки):
+   данные   = 0.3 + 0.4 + 0.3 + 0.05 ≈ 1 ТБ
+   capacity = 1 ТБ × 1.4 (индексы) × 1.3 (запас: рост, WAL, врем. файлы) ≈ 1.8 ТБ
+   iops     = 827 + 895 + 290 + 597 = 2609
+
+   Disks_for_capacity = 1.8 ТБ / 100 ТБ = 0.018 ≈ 1
+   Disks_for_iops     = 2609 / 1000      = 2.6  ≈ 3
+   Disks = max(1, 3) = 3 SSD
+
+Cassandra (Лайки):
+   данные   = 0.6 ТБ
+   capacity = 0.6 ТБ × 1.3 (запас) ≈ 0.78 ТБ
+   iops     = 1160
+
+   Disks_for_capacity = 0.78 ТБ / 100 ТБ = 0.008 ≈ 1
+   Disks_for_iops     = 1160 / 1000       = 1.16 ≈ 2
+   Disks = max(1, 2) = 2 SSD
+````
+
+**Итого: 5 × SSD SATA:** 
+- Postgres — 3 SSD по 2 ТБ, 
+- Cassandra — 2 SSD по 1 ТБ
+
+
